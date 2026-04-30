@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bma2dbdehw7wr"]
+
+[ext_resource type="Script" uid="uid://be4c1vhrftwry" path="res://Scenes/player_grid.gd" id="1_p2j2y"]
+[ext_resource type="PackedScene" uid="uid://c62f2pvd4v3wy" path="res://Scenes/troop.tscn" id="2_2smqu"]
+
+[node name="PlayerGrid" type="Node3D" unique_id=1564591635]
+script = ExtResource("1_p2j2y")
+
+[node name="Troop" parent="." unique_id=648803216 instance=ExtResource("2_2smqu")]
+
+[node name="Troop2" parent="." unique_id=894168215 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+grid_coordinate = Vector2(1, 0)
+
+[node name="Troop3" parent="." unique_id=574419913 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+grid_coordinate = Vector2(2, 0)
+
+[node name="Troop4" parent="." unique_id=1341278033 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+grid_coordinate = Vector2(0, 1)
+
+[node name="Troop5" parent="." unique_id=1895138356 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+grid_coordinate = Vector2(1, 1)
+
+[node name="Troop6" parent="." unique_id=1252546083 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
+grid_coordinate = Vector2(2, 1)
+
+[node name="Troop7" parent="." unique_id=2044224057 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+grid_coordinate = Vector2(0, 2)
+
+[node name="Troop8" parent="." unique_id=1723123912 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
+grid_coordinate = Vector2(1, 2)
+
+[node name="Troop9" parent="." unique_id=2039311379 instance=ExtResource("2_2smqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
+grid_coordinate = Vector2(2, 2)

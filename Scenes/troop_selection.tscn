@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://cqgk5iiasjxv8"]
+
+[ext_resource type="PackedScene" uid="uid://bma2dbdehw7wr" path="res://Scenes/player_grid.tscn" id="1_dawlg"]
+[ext_resource type="Script" uid="uid://oht10j7nirqo" path="res://Scenes/reserve_troop.gd" id="2_oeuoy"]
+
+[node name="TroopSelection" type="Node3D" unique_id=1366481618]
+
+[node name="PlayerGrid" parent="." unique_id=1564591635 instance=ExtResource("1_dawlg")]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=471127196]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 2, 6, 2)
+
+[node name="UIOverlay" type="CanvasLayer" parent="." unique_id=582384267]
+script = ExtResource("2_oeuoy")
+
+[node name="Control" type="Control" parent="UIOverlay" unique_id=41784101]
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="UIOverlay/Control" unique_id=886197888]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIOverlay/Control/MarginContainer" unique_id=1807618920]
+layout_mode = 2
+
+[node name="SelectedTroopLabel" type="Label" parent="UIOverlay/Control/MarginContainer/VBoxContainer" unique_id=132655477]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Holding: Nothing"
+
+[node name="ReserveBench" type="HBoxContainer" parent="UIOverlay/Control/MarginContainer/VBoxContainer" unique_id=320192388]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StartBattleButton" type="Button" parent="UIOverlay/Control/MarginContainer/VBoxContainer" unique_id=364781134]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Start Battle"
+
+[connection signal="pressed" from="UIOverlay/Control/MarginContainer/VBoxContainer/StartBattleButton" to="UIOverlay" method="_on_start_battle_button_pressed"]

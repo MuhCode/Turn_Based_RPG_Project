@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://d2i4rkld6lx21"]
+
+[ext_resource type="Script" uid="uid://dwg4ts4rvmgj5" path="res://Scenes/troop_shop_ui.gd" id="1_funa3"]
+[ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="2_7rnd6"]
+[ext_resource type="Resource" uid="uid://cdq1qfqgjhic0" path="res://Resources/retinue_archer.tres" id="3_0pwxp"]
+[ext_resource type="Resource" uid="uid://c5kkafeprj65v" path="res://Resources/retinue_swordsmen.tres" id="4_qjjmv"]
+[ext_resource type="Resource" uid="uid://dxey8nc6luxps" path="res://Resources/vagabonds_melee.tres" id="5_nmnfp"]
+
+[node name="TroopShopUI" type="Control" unique_id=665735405]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_funa3")
+shop_inventory = Array[ExtResource("2_7rnd6")]([ExtResource("3_0pwxp"), ExtResource("4_qjjmv"), ExtResource("5_nmnfp")])
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=838245570]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="MainLayout" type="VBoxContainer" parent="MarginContainer" unique_id=1690528292]
+layout_mode = 2
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/MainLayout" unique_id=609023808]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Gold: 500"
+
+[node name="TroopShelf" type="HBoxContainer" parent="MarginContainer/MainLayout" unique_id=1728144769]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MarginContainer/MainLayout" unique_id=123967662]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Return to Camp"
+
+[node name="TroopEditorButton" type="Button" parent="MarginContainer/MainLayout" unique_id=375671235]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Edit Troop Formation"
+
+[connection signal="pressed" from="MarginContainer/MainLayout/TroopEditorButton" to="." method="_on_troop_editor_button_pressed"]

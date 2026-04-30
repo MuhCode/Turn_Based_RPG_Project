@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://c62f2pvd4v3wy"]
+
+[ext_resource type="Script" uid="uid://bfylqulnddrac" path="res://Scenes/grid_slot.gd" id="1_mg4y4"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_oxqw4"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mg4y4"]
+
+[node name="Troop" type="Marker3D" unique_id=648803216]
+script = ExtResource("1_mg4y4")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=890676489]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D" unique_id=1989729941]
+mesh = SubResource("CapsuleMesh_oxqw4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2124749567]
+shape = SubResource("CapsuleShape3D_mg4y4")
