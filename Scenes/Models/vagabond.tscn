@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cgu7cua2ya5cv"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w2y7y"]
+albedo_color = Color(1, 0.023529412, 0.2, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_thwko"]
+material = SubResource("StandardMaterial3D_w2y7y")
+
+[node name="Vagabond" type="Node3D" unique_id=783686591]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=241483459]
+mesh = SubResource("CapsuleMesh_thwko")

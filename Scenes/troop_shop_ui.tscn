@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dwg4ts4rvmgj5" path="res://Scenes/troop_shop_ui.gd" id="1_funa3"]
 [ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="2_7rnd6"]
-[ext_resource type="Resource" uid="uid://cdq1qfqgjhic0" path="res://Resources/retinue_archer.tres" id="3_0pwxp"]
-[ext_resource type="Resource" uid="uid://c5kkafeprj65v" path="res://Resources/retinue_swordsmen.tres" id="4_qjjmv"]
-[ext_resource type="Resource" uid="uid://dxey8nc6luxps" path="res://Resources/vagabonds_melee.tres" id="5_nmnfp"]
+[ext_resource type="Resource" uid="uid://cdq1qfqgjhic0" path="res://Resources/Troops/retinue_archer.tres" id="3_0pwxp"]
+[ext_resource type="Resource" uid="uid://c5kkafeprj65v" path="res://Resources/Troops/retinue_swordsmen.tres" id="4_qjjmv"]
+[ext_resource type="Resource" uid="uid://dxey8nc6luxps" path="res://Resources/Troops/vagabonds_melee.tres" id="5_nmnfp"]
 
 [node name="TroopShopUI" type="Control" unique_id=665735405]
 layout_mode = 3

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CommanderOrder" format=3 uid="uid://04xqxnekaf2c"]
+
+[ext_resource type="Script" uid="uid://d2glkabxjrhda" path="res://Scripts/commander_order.gd" id="1_xrrnb"]
+
+[resource]
+script = ExtResource("1_xrrnb")
+order_name = "Attack!"
+effect_value = 0.1
+metadata/_custom_type_script = "uid://d2glkabxjrhda"

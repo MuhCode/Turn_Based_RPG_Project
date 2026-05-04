@@ -3,9 +3,17 @@ extends Node
 var reserve_troop_inventory: Array[PlayerTroopData] = []
 var player_currency: int = 500
 var active_formation: Dictionary = {}
-
-# This holds the troop the player clicked in the UI, waiting to be placed.
 var troop_to_place: PlayerTroopData = null
+
+# The master list of orders
+var unlocked_orders: Array[CommanderOrder] = []
+
+func _ready() -> void:
+	# Add the starting cards to the deck the moment the game boots!
+	# (NOTE: Double-check these file paths to make sure they match where you saved them!)
+	unlocked_orders.append(preload("res://Resources/Moves/Attack!.tres"))
+	unlocked_orders.append(preload("res://Resources/Moves/Stand_Strong!.tres"))
+	unlocked_orders.append(preload("res://Resources/Moves/Press_the_Advantage!.tres"))
 
 signal currency_change(new_currency: int)
 

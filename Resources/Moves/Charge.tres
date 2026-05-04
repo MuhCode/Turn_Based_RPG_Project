@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ActionTemplate" format=3 uid="uid://dpttdgo23afsr"]
+
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_cv0oi"]
+
+[resource]
+script = ExtResource("1_cv0oi")
+action_name = "Charge"
+power_scale = 1.2
+status_to_apply = "None"
+metadata/_custom_type_script = "uid://bgmgv01oo5pyy"

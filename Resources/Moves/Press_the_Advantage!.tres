@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CommanderOrder" format=3 uid="uid://4pmuvw2ohc7s"]
+
+[ext_resource type="Script" uid="uid://d2glkabxjrhda" path="res://Scripts/commander_order.gd" id="1_7x8er"]
+
+[resource]
+script = ExtResource("1_7x8er")
+order_name = "Press the Advantage!"
+effect_type = 2
+effect_value = 2.0
+metadata/_custom_type_script = "uid://d2glkabxjrhda"

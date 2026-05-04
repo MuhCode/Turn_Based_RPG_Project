@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ActionTemplate" format=3 uid="uid://bw11uyq6exnnu"]
+
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_enhia"]
+
+[resource]
+script = ExtResource("1_enhia")
+action_name = "Volley"
+action_intensity = 2
+power_scale = 0.8
+status_to_apply = "None"
+metadata/_custom_type_script = "uid://bgmgv01oo5pyy"

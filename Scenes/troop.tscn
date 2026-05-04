@@ -6,13 +6,13 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mg4y4"]
 
-[node name="Troop" type="Marker3D" unique_id=648803216]
+[node name="GridSlot" type="Area3D" unique_id=890676489]
 script = ExtResource("1_mg4y4")
 
-[node name="Area3D" type="Area3D" parent="." unique_id=890676489]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D" unique_id=1989729941]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1989729941]
 mesh = SubResource("CapsuleMesh_oxqw4")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2124749567]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2124749567]
 shape = SubResource("CapsuleShape3D_mg4y4")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]

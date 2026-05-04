@@ -24,10 +24,14 @@ enum AttackRange {
 @export var visual_scene: PackedScene
 
 @export_group("Stats")
-@export var max_health: int = 10
-@export var min_health: int = 7
+@export var max_health: int = 200
+@export var min_health: int = 100
 @export var base_morale: int = 100
-@export var max_damage: int = 3
-@export var min_damage: int = 1
+@export var max_damage: int = 50
+@export var min_damage: int = 25
 @export var max_speed: int = 2
 @export var min_speed: int = 1
+
+@export_group("Moves")
+@export var offensive_moves: Array[ActionTemplate] = []
+@export var defensive_moves: Array[ActionTemplate] = []

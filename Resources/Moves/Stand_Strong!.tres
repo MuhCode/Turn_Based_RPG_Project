@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CommanderOrder" format=3 uid="uid://ds6bkcmfi0uf5"]
+
+[ext_resource type="Script" uid="uid://d2glkabxjrhda" path="res://Scripts/commander_order.gd" id="1_7jn3f"]
+
+[resource]
+script = ExtResource("1_7jn3f")
+order_name = "Stand Strong!"
+effect_type = 1
+effect_value = 0.1
+metadata/_custom_type_script = "uid://d2glkabxjrhda"

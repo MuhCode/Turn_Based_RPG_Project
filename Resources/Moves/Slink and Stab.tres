@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ActionTemplate" format=3 uid="uid://bml3ek5teqacp"]
+
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_m2crf"]
+
+[resource]
+script = ExtResource("1_m2crf")
+action_name = "Stab"
+action_intensity = 1
+power_scale = 0.75
+status_to_apply = "None"
+metadata/_custom_type_script = "uid://bgmgv01oo5pyy"

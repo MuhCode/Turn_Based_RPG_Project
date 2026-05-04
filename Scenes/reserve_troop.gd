@@ -4,15 +4,25 @@ extends CanvasLayer
 @onready var holding_label = %SelectedTroopLabel
 
 func _ready() -> void:
-	refresh_bench()
+	# 1. Wait a split second for the 3D grid slots to load completely
+	await get_tree().create_timer(0.1).timeout
+	
+	# 2. Tell the GridSlots to unlock and show their grey cylinders!
+	SignalBus.troop_selection_started.emit()
+	
+	# 3. Connect our UI refresh signals
 	SignalBus.troop_placed.connect(_on_troop_placed_on_grid)
+	SignalBus.reserve_updated.connect(refresh_bench) # <-- ADDED: Listens for removed troops!
+	
+	# 4. Draw the bench
+	refresh_bench()
 
 func refresh_bench() -> void:
-	# 1. Clear out any old buttons (in case we refresh after placing a troop)
+	# Clear out any old buttons
 	for child in bench.get_children():
 		child.queue_free()
 		
-	# 2. Look at the vault and build a button for every troop in reserve
+	# Look at the vault and build a button for every troop in reserve
 	for troop in PlayerData.reserve_troop_inventory:
 		var btn = Button.new()
 		
@@ -31,12 +41,11 @@ func _on_troop_button_pressed(selected_troop: PlayerTroopData) -> void:
 	
 	# Update the UI text so the player knows who they are holding
 	holding_label.text = "Holding: " + selected_troop.template.troop_name
-	
 
 func _on_troop_placed_on_grid() -> void:
-	refresh_bench()
+	# We just clear the text here. 
+	# The actual bench refresh is handled by the reserve_updated signal now!
 	holding_label.text = "Holding: Nothing"
-
 
 func _on_start_battle_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/battle_scene.tscn")

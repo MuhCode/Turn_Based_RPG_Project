@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BaseTroopTemplate" format=3 uid="uid://dxey8nc6luxps"]
+
+[ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="1_jptj1"]
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_qt0g6"]
+[ext_resource type="Resource" uid="uid://cgfgwgxr6eoi" path="res://Resources/Moves/Disperse.tres" id="2_o5avm"]
+[ext_resource type="Resource" uid="uid://bml3ek5teqacp" path="res://Resources/Moves/Slink and Stab.tres" id="3_gapil"]
+[ext_resource type="PackedScene" uid="uid://cgu7cua2ya5cv" path="res://Scenes/Models/vagabond.tscn" id="5_o5avm"]
+
+[resource]
+script = ExtResource("1_jptj1")
+troop_name = "Vagabonds"
+visual_scene = ExtResource("5_o5avm")
+max_health = 250
+min_health = 150
+base_morale = 50
+max_damage = 45
+min_damage = 20
+offensive_moves = Array[ExtResource("1_qt0g6")]([ExtResource("3_gapil")])
+defensive_moves = Array[ExtResource("1_qt0g6")]([ExtResource("2_o5avm")])
+metadata/_custom_type_script = "uid://006v6amg320n"

@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="BaseTroopTemplate" format=3 uid="uid://c5kkafeprj65v"]
-
-[ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="1_anm0s"]
-
-[resource]
-script = ExtResource("1_anm0s")
-Faction = 1
-troop_name = "Retinue Swordsman"
-metadata/_custom_type_script = "uid://006v6amg320n"

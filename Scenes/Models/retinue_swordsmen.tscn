@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bo7jr1ymusbha"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xo8iq"]
+albedo_color = Color(0.18431373, 0.22352941, 1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_xt6p2"]
+material = SubResource("StandardMaterial3D_xo8iq")
+
+[node name="RetinueSwordsmen" type="Node3D" unique_id=783686591]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1870603877]
+mesh = SubResource("CylinderMesh_xt6p2")

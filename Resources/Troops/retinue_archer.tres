@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BaseTroopTemplate" format=3 uid="uid://cdq1qfqgjhic0"]
+
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_atywh"]
+[ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="1_max1w"]
+[ext_resource type="Resource" uid="uid://co3y8idlqfrq4" path="res://Resources/Moves/Dodge.tres" id="2_ikx7o"]
+[ext_resource type="Resource" uid="uid://bw11uyq6exnnu" path="res://Resources/Moves/Volley.tres" id="3_ye770"]
+[ext_resource type="PackedScene" uid="uid://d124iae64w0qt" path="res://Scenes/Models/retinue_archer.tscn" id="5_ikx7o"]
+
+[resource]
+script = ExtResource("1_max1w")
+attack_range = 1
+troop_name = "Retinue Archers"
+visual_scene = ExtResource("5_ikx7o")
+max_health = 175
+min_health = 150
+max_damage = 45
+min_damage = 35
+max_speed = 3
+min_speed = 2
+offensive_moves = Array[ExtResource("1_atywh")]([ExtResource("3_ye770")])
+defensive_moves = Array[ExtResource("1_atywh")]([ExtResource("2_ikx7o")])
+metadata/_custom_type_script = "uid://006v6amg320n"
