@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ActionTemplate" format=3 uid="uid://co3y8idlqfrq4"]
+
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_42hme"]
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="2_37b3g"]
+[ext_resource type="Resource" uid="uid://dhwvg8i8wvx87" path="res://Resources/Moves/SE_BasicBlock.tres" id="3_35u63"]
+
+[resource]
+script = ExtResource("1_42hme")
+action_name = "Dodge"
+action_type = 1
+action_intensity = 1
+power_scale = 0.0
+statuses_to_apply = Array[ExtResource("2_37b3g")]([ExtResource("3_35u63")])
+metadata/_custom_type_script = "uid://bgmgv01oo5pyy"

@@ -10,11 +10,19 @@ var current_state: BattleState
 var turn_order: Array = []
 var current_acting_index: int = 0
 
+# Turn execution variables
+var current_acting_troop: Node3D = null
+var queued_attack: ActionTemplate = null
+var queued_target: Node3D = null
+var queued_defense: ActionTemplate = null
+
+# Track the outcome for the resolution phase
+var player_won: bool = false
+
 func _ready() -> void:
-	# Connect to the UI so we can hear what the Commander decides!
 	SignalBus.commander_order_issued.connect(_on_commander_order_issued)
+	SignalBus.player_turn_choice_made.connect(_on_player_turn_choice_made)
 	
-	# We wait a brief moment to ensure all grid slots and autoloads are fully loaded
 	await get_tree().create_timer(0.1).timeout
 	change_state(BattleState.SETUP)
 
@@ -33,171 +41,373 @@ func change_state(new_state: BattleState) -> void:
 			_run_resolution()
 
 # ==========================================
-# SETUP PHASE LOGIC
+# SETUP PHASE
 # ==========================================
 
 func _run_setup() -> void:
 	print("STATE: --- BATTLE START ---")
 	
-	# 1. Tell the global bus we are in combat (hides empty slots)
-	SignalBus.battle_phase_started.emit()
-	
-	# 2. Build the Player's Army
-	# We iterate through the dictionary of saved coordinates in the Autoload
+	var player_troop_count = 0
 	for coord in PlayerData.active_formation:
 		var troop_data = PlayerData.active_formation[coord]
-		
-		# Find the physical grid slot that matches this Vector2 coordinate
 		var target_slot = _find_grid_slot_at(coord, player_grid)
 		
 		if target_slot != null:
-			# Spawn the 3D visual model attached to the blueprint
+			player_troop_count += 1
+			target_slot.assigned_troop = troop_data 
+			
+			if target_slot.default_mesh != null:
+				target_slot.default_mesh.visible = false
+			
 			if troop_data.template.visual_scene != null:
 				var visual_instance = troop_data.template.visual_scene.instantiate()
+				visual_instance.add_to_group("troop_model") # <--- ADD THIS LINE
 				target_slot.add_child(visual_instance)
 				
-			# Initialize the live stats
 			target_slot.initialize_combat_stats(troop_data)
-			
-			# Connect the Manager to the new HP vs Morale signals
 			target_slot.unit_incapacitated.connect(_on_unit_incapacitated)
 			target_slot.unit_permadead.connect(_on_unit_permadead)
 			
-	# (Enemy Army generation will be injected right here later)
+	# Enemy Spawner logic
+	var vagabond_template = preload("res://Resources/Troops/vagabonds_melee.tres") 
 	
+	var enemy_slots = []
+	for child in enemy_grid.get_children():
+		if child is GridSlot:
+			enemy_slots.append(child)
+	enemy_slots.sort_custom(func(a, b): return a.grid_coordinate.x < b.grid_coordinate.x)
+	
+	for i in range(player_troop_count):
+		if i < enemy_slots.size():
+			var slot = enemy_slots[i]
+			var enemy_data = PlayerTroopData.new()
+			
+			# --- NEW: Let the PlayerTroopData roll its own permanent stats! ---
+			enemy_data.setup_new_troop(vagabond_template)
+			
+			slot.assigned_troop = enemy_data
+			
+			if slot.default_mesh != null:
+				slot.default_mesh.visible = false
+				
+			if vagabond_template.visual_scene != null:
+				var visual_instance = vagabond_template.visual_scene.instantiate()
+				visual_instance.add_to_group("troop_model") # <--- ADD THIS LINE
+				slot.add_child(visual_instance)
+				
+			slot.initialize_combat_stats(enemy_data)
+			slot.unit_incapacitated.connect(_on_unit_incapacitated)
+			slot.unit_permadead.connect(_on_unit_permadead)
+	
+	SignalBus.battle_phase_started.emit()
 	change_state(BattleState.ROUND_INIT)
 
-# --- Helper Function for Setup ---
 func _find_grid_slot_at(coord: Vector2, grid_parent: Node3D) -> Node3D:
 	for child in grid_parent.get_children():
 		if child is GridSlot and child.grid_coordinate == coord:
 			return child
 	return null
 
-# --- Signal Receivers for later phases ---
-func _on_unit_incapacitated(slot: GridSlot) -> void:
-	# Fixed the path to grab the name from the template!
-	print(slot.assigned_troop.template.troop_name, " is incapacitated for this battle!")
-	# Logic to remove them from turn_order goes here later
+func _on_unit_incapacitated(slot: Node3D) -> void:
+	print(slot.assigned_troop.template.troop_name, " is down!")
+	_remove_troop_from_timeline(slot)
 
-func _on_unit_permadead(slot: GridSlot) -> void:
-	print(slot.assigned_troop.template.troop_name, " HAS PERMANENTLY DIED!")
-	# Logic to delete them from PlayerData goes here later
+func _on_unit_permadead(slot: Node3D) -> void:
+	print(slot.assigned_troop.template.troop_name, " is gone for good!")
+	_remove_troop_from_timeline(slot)
+
+func _remove_troop_from_timeline(dead_slot: Node3D) -> void:
+	var index_in_timeline = turn_order.find(dead_slot)
+	
+	if index_in_timeline != -1:
+		turn_order.remove_at(index_in_timeline)
+		
+		if index_in_timeline <= current_acting_index:
+			current_acting_index -= 1
+	
+	# Check if the fight is over every time someone is removed
+	_check_battle_status()
+
+func _check_battle_status() -> void:
+	var players_alive = false
+	var enemies_alive = false
+	
+	for slot in player_grid.get_children():
+		if slot is GridSlot and slot.assigned_troop != null and slot.current_health > 0:
+			players_alive = true
+			break
+			
+	for slot in enemy_grid.get_children():
+		if slot is GridSlot and slot.assigned_troop != null and slot.current_health > 0:
+			enemies_alive = true
+			break
+			
+	if not enemies_alive:
+		player_won = true
+		change_state(BattleState.RESOLUTION)
+	elif not players_alive:
+		player_won = false
+		change_state(BattleState.RESOLUTION)
 
 # ==========================================
-# PHASE 3: ROUND INITIALIZATION
+# ROUND INITIALIZATION
 # ==========================================
 
 func _run_round_init() -> void:
-	print("\n--- NEW ROUND ---")
+	# Don't start a new round if we just triggered resolution
+	if current_state == BattleState.RESOLUTION: return
 	
+	print("\n--- NEW ROUND ---")
 	turn_order.clear()
 	var initiative_tracker: Array = []
-	
-	# 1. Check both grids for living troops
 	var all_grids = [player_grid, enemy_grid]
 	
 	for grid in all_grids:
-		# If you haven't assigned an enemy_grid yet in the inspector, this prevents a crash
-		if grid == null: 
-			continue
-			
+		if grid == null: continue
 		for child in grid.get_children():
 			if child is GridSlot and child.assigned_troop != null:
+				if child.has_method("process_statuses"):
+					child.process_statuses("round_start")
 				
-				# Only include troops that are currently conscious and alive
-				if child.current_health > 0 and child.current_morale > 0:
+				# Ask the GridSlot for its modified speed instead of doing the math here
+				if child.current_health > 0:
+					var roll = child.get_modified_speed() + randi_range(1, 4)
+					initiative_tracker.append({"slot": child, "roll": roll})
 					
-					# 2. Calculate Initiative: Speed + 1d4 + Modifiers
-					var roll = child.assigned_troop.troop_speed + randi_range(1, 4) + child.next_round_speed_modifier
-					
-					# Reset the modifier for the next round
-					child.next_round_speed_modifier = 0 
-					
-					# Store the math temporarily
-					initiative_tracker.append({
-						"slot": child,
-						"roll": roll
-					})
-					
-	# 3. Sort the array from highest roll to lowest roll
 	initiative_tracker.sort_custom(func(a, b): return a["roll"] > b["roll"])
 	
-	# 4. Lock in the official turn order
-	print("Turn Order:")
 	for i in range(initiative_tracker.size()):
-		var slot = initiative_tracker[i]["slot"]
-		var roll = initiative_tracker[i]["roll"]
-		turn_order.append(slot)
-		print(str(i + 1) + ". " + slot.assigned_troop.template.troop_name + " (Init Roll: " + str(roll) + ")")
+		turn_order.append(initiative_tracker[i]["slot"])
 		
-	# 5. Reset the acting index
 	current_acting_index = 0
-	
-	# 6. Move straight to the Commander Phase
 	change_state(BattleState.COMMANDER_PHASE)
 
-
 # ==========================================
-# PHASE 4: COMMANDER PHASE
+# COMMANDER PHASE
 # ==========================================
 
 func _run_commander_phase() -> void:
 	print("\n--- COMMANDER PHASE ---")
-	
-	# This shouts out to the UI to slide the buttons onto the screen
 	SignalBus.commander_phase_started.emit()
-	
-	# THE MAGIC TRICK: The manager now STOPS. It will wait indefinitely 
-	# until the UI sends the 'commander_order_issued' signal back.
 
 func _on_commander_order_issued(order: CommanderOrder, target_coord: Vector2) -> void:
-	# If the target coordinate is (-1, -1), it means they hit the Skip button!
 	if order != null and target_coord != Vector2(-1, -1):
-		# Find the physical GridSlot based on the coordinate the UI sent us
 		var target_slot = player_grid.physical_grid[target_coord]
-		
 		print("Commander used ", order.order_name, " on ", target_slot.assigned_troop.template.troop_name)
 		
-		match order.effect_type:
-			CommanderOrder.EffectType.ATTACK_BUFF:
-				target_slot.add_status_effect("attack_buff", order.effect_value)
-			CommanderOrder.EffectType.DEFENSE_BUFF:
-				target_slot.add_status_effect("defense_buff", order.effect_value)
-			CommanderOrder.EffectType.SPEED_BUFF:
-				target_slot.next_round_speed_modifier += int(order.effect_value)
-				_resort_initiative() # Re-sort the timeline!
-	else:
-		print("Commander skipped their order.")
+		var requires_timeline_resort = false
 		
-	# Move to the actual fighting!
+		# Apply statuses normally
+		for status in order.statuses_to_apply:
+			if status == null or status.effect_name == "":
+				continue
+				
+			target_slot.add_status_effect(status.effect_name, status.value, status.duration, status.tick_when)
+			
+			# If the effect name contains the word "speed", flag the timeline for a resort
+			if "speed" in status.effect_name:
+				requires_timeline_resort = true
+				
+		# If a speed buff was applied mid-round, update the turn order immediately!
+		if requires_timeline_resort:
+			_resort_initiative()
+	else:
+		print("Commander phase skipped.")
+		
 	change_state(BattleState.TROOP_TURNS)
 
 func _resort_initiative() -> void:
-	print("Re-sorting Initiative due to Speed Buff...")
-	
-	# Sort the existing turn order based on their new adjusted speed
+	print("Re-sorting Initiative due to speed change...")
 	turn_order.sort_custom(func(a, b): 
-		var speed_a = a.assigned_troop.troop_speed + a.next_round_speed_modifier
-		var speed_b = b.assigned_troop.troop_speed + b.next_round_speed_modifier
-		return speed_a > speed_b
+		return a.get_modified_speed() > b.get_modified_speed()
 	)
-	
-	# Print the new timeline so you can verify it worked!
-	print("New Turn Order:")
-	for i in range(turn_order.size()):
-		var slot = turn_order[i]
-		var total_speed = slot.assigned_troop.troop_speed + slot.next_round_speed_modifier
-		print(str(i + 1) + ". " + slot.assigned_troop.template.troop_name + " (Adjusted Speed: " + str(total_speed) + ")")
-
 
 # ==========================================
-# STUBS FOR FUTURE PHASES
+# TROOP TURNS
 # ==========================================
 
 func _run_troop_turns() -> void:
-	print("\n--- TROOP TURNS PHASE ---")
-	# We will build Phase 5 here next!
+	if current_state == BattleState.RESOLUTION: return
+	
+	if current_acting_index >= turn_order.size():
+		change_state(BattleState.ROUND_INIT)
+		return
+		
+	current_acting_troop = turn_order[current_acting_index]
+	
+	if current_acting_troop.current_health <= 0:
+		_end_current_turn()
+		return
+		
+	if current_acting_troop.has_method("process_statuses"):
+		current_acting_troop.process_statuses("turn_start")
+		
+	if current_acting_troop.has_method("process_statuses"):
+		current_acting_troop.process_statuses("turn_start")
+		
+	# Add this line back in so you know who is waiting for orders!
+	print("\n--- TURN: ", current_acting_troop.assigned_troop.template.troop_name, " ---")
+		
+	if current_acting_troop.get_parent() == player_grid:
+		queued_attack = null
+		queued_target = null
+		queued_defense = null
+		SignalBus.player_turn_started.emit("attack")
+	else:
+		_run_enemy_ai()
+
+func _on_player_turn_choice_made(choice_type: String, choice_value: Variant) -> void:
+	if choice_type == "attack":
+		queued_attack = choice_value
+		SignalBus.player_turn_started.emit("target") 
+	elif choice_type == "target":
+		queued_target = enemy_grid.physical_grid[choice_value]
+		SignalBus.player_turn_started.emit("defense") 
+	elif choice_type == "defense":
+		queued_defense = choice_value
+		_execute_combat_math()
+
+func _run_enemy_ai() -> void:
+	var valid_targets = []
+	for child in player_grid.get_children():
+		if child is GridSlot and child.assigned_troop != null and child.current_health > 0:
+			valid_targets.append(child)
+			
+	if valid_targets.is_empty():
+		_end_current_turn()
+		return
+		
+	valid_targets.sort_custom(func(a, b): return a.current_health < b.current_health)
+	
+	var roll = randf()
+	var chosen_target = valid_targets[0] 
+	if valid_targets.size() > 1:
+		if roll > 0.60 and roll <= 0.90:
+			chosen_target = valid_targets[1]
+		elif roll > 0.90:
+			var idx = randi_range(2, valid_targets.size() - 1) if valid_targets.size() > 2 else 1
+			chosen_target = valid_targets[idx]
+			
+	# Dynamically pull moves from the acting enemy's template
+	var ai_template = current_acting_troop.assigned_troop.template
+	
+	if ai_template.offensive_moves.size() > 0:
+		queued_attack = ai_template.offensive_moves.pick_random()
+	else:
+		queued_attack = null
+		
+	if ai_template.defensive_moves.size() > 0:
+		queued_defense = ai_template.defensive_moves.pick_random()
+	else:
+		queued_defense = null
+		
+	queued_target = chosen_target
+	
+	await get_tree().create_timer(1.0).timeout 
+	_execute_combat_math()
+
+func _execute_combat_math() -> void:
+	if queued_target == null or queued_target.current_health <= 0:
+		_end_current_turn()
+		return
+
+	var total_damage_output: int = 0
+	
+	# 1. Process Defense Choice
+	if queued_defense != null and queued_defense is ActionTemplate:
+		_route_status_effect(queued_defense, current_acting_troop, queued_target)
+			
+	# 2. Process Attack Choice
+	if queued_attack != null and queued_attack is ActionTemplate:
+		
+		# --- NEW: Read the permanent, locked-in stat from the generated soldier ---
+		var troop_attack_stat = current_acting_troop.assigned_troop.troop_damage 
+		
+		total_damage_output = current_acting_troop.calculate_modified_damage(
+			troop_attack_stat, 
+			queued_attack.power_scale
+		)
+		
+		_route_status_effect(queued_attack, current_acting_troop, queued_target)
+
+	# 3. Target attempts to defend
+	var final_dmg = queued_target.calculate_incoming_damage(total_damage_output)
+	
+	queued_target.current_health -= final_dmg
+	print(current_acting_troop.assigned_troop.template.troop_name, " hits for ", final_dmg, " damage!")
+	
+	# --- NEW: THE DEATH CHECK ---
+	if queued_target.current_health <= 0:
+		queued_target.current_health = 0
+		
+		# 1. Emit the signal BEFORE clearing data so the manager can print the name
+		queued_target.unit_permadead.emit(queued_target)
+		
+		# 2. Delete the 3D visual model using our safe group tag
+		for child in queued_target.get_children():
+			if child.is_in_group("troop_model"):
+				child.queue_free()
+				
+		# 3. Turn the default grid tile back on
+		if queued_target.default_mesh != null:
+			queued_target.default_mesh.visible = true
+			
+		# 4. Wipe the slot completely clean
+		queued_target.assigned_troop = null
+		if queued_target.has_method("active_statuses"):
+			queued_target.active_statuses.clear()
+	
+	_end_current_turn()
+
+func _end_current_turn() -> void:
+	if current_acting_troop.has_method("process_statuses"):
+		current_acting_troop.process_statuses("turn_end")
+		
+	current_acting_index += 1
+	await get_tree().create_timer(0.8).timeout 
+	_run_troop_turns()
+
+
+# ==========================================
+# RESOLUTION PHASE
+# ==========================================
 
 func _run_resolution() -> void:
-	pass
+	if player_won:
+		print("VICTORY! Awarding 100 gold.")
+		PlayerData.player_currency += 100
+	else:
+		print("DEFEAT! Better luck next time.")
+	
+	# Small delay so player can see the logs/final state
+	await get_tree().create_timer(2.5).timeout
+	
+	# Transition back to shop
+	# Make sure this path matches your shop scene location!
+	get_tree().change_scene_to_file("res://Scenes/troop_shop_ui.tscn")
+
+# --- Modular Status Router ---
+func _route_status_effect(action: ActionTemplate, user_slot: Node3D, target_slot: Node3D) -> void:
+	# Loop through every status attached to this move
+	for status in action.statuses_to_apply:
+		if status == null or status.effect_name == "":
+			continue
+			
+		# Look at the tag inside the StatusEffectData to figure out WHERE this effect goes
+		match status.target:
+			StatusEffectData.TargetScope.SELF:
+				user_slot.add_status_effect(status.effect_name, status.value, status.duration, status.tick_when)
+				
+			StatusEffectData.TargetScope.SINGLE_TARGET:
+				if target_slot != null:
+					target_slot.add_status_effect(status.effect_name, status.value, status.duration, status.tick_when)
+				
+			StatusEffectData.TargetScope.SINGLE_TARGET:
+				if target_slot != null:
+					target_slot.add_status_effect(status.effect_name, status.value, status.duration)
+					
+			StatusEffectData.TargetScope.ROW:
+				print("Row targeting tag recognized (Logic for grabbing row slots goes here later)")
+				
+			StatusEffectData.TargetScope.ARMY:
+				print("Army targeting tag recognized (Logic for grabbing all allies goes here later)")

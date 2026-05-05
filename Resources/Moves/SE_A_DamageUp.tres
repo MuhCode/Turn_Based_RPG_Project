@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://dmokccgxslc5w"]
+
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="1_ixq32"]
+
+[resource]
+script = ExtResource("1_ixq32")
+effect_name = "Damage Up"
+target = 2
+value = 0.1
+tick_when = 2
+metadata/_custom_type_script = "uid://b1ffbp5vfrtr1"

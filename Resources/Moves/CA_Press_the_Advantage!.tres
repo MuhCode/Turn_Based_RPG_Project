@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CommanderOrder" format=3 uid="uid://4pmuvw2ohc7s"]
+
+[ext_resource type="Script" uid="uid://d2glkabxjrhda" path="res://Scripts/commander_order.gd" id="1_x0vv3"]
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="2_tg8js"]
+[ext_resource type="Resource" uid="uid://u4b4no0wwukj" path="res://Resources/Moves/SE_BasicSpeedUp.tres" id="3_ttjpw"]
+
+[resource]
+script = ExtResource("1_x0vv3")
+order_name = "Press the Advantage!"
+statuses_to_apply = Array[ExtResource("2_tg8js")]([ExtResource("3_ttjpw")])
+metadata/_custom_type_script = "uid://d2glkabxjrhda"

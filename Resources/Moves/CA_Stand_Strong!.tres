@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CommanderOrder" format=3 uid="uid://ds6bkcmfi0uf5"]
+
+[ext_resource type="Script" uid="uid://d2glkabxjrhda" path="res://Scripts/commander_order.gd" id="1_3vohg"]
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="2_u8egt"]
+[ext_resource type="Resource" uid="uid://cols1jte5pfty" path="res://Resources/Moves/SE_PTA_DefenseUp.tres" id="3_tr5va"]
+
+[resource]
+script = ExtResource("1_3vohg")
+order_name = "Stand Strong!"
+statuses_to_apply = Array[ExtResource("2_u8egt")]([ExtResource("3_tr5va")])
+metadata/_custom_type_script = "uid://d2glkabxjrhda"

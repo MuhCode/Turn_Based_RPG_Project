@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_atywh"]
 [ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="1_max1w"]
-[ext_resource type="Resource" uid="uid://co3y8idlqfrq4" path="res://Resources/Moves/Dodge.tres" id="2_ikx7o"]
-[ext_resource type="Resource" uid="uid://bw11uyq6exnnu" path="res://Resources/Moves/Volley.tres" id="3_ye770"]
+[ext_resource type="Resource" uid="uid://co3y8idlqfrq4" path="res://Resources/Moves/DA_Dodge.tres" id="2_ikx7o"]
+[ext_resource type="Resource" uid="uid://bw11uyq6exnnu" path="res://Resources/Moves/OA_Volley.tres" id="3_ye770"]
 [ext_resource type="PackedScene" uid="uid://d124iae64w0qt" path="res://Scenes/Models/retinue_archer.tscn" id="5_ikx7o"]
 
 [resource]

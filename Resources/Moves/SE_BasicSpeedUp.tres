@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://u4b4no0wwukj"]
+
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="1_oa063"]
+
+[resource]
+script = ExtResource("1_oa063")
+effect_name = "Basic Speed Up"
+value = 1.0
+tick_when = 2
+metadata/_custom_type_script = "uid://b1ffbp5vfrtr1"

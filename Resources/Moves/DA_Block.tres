@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ActionTemplate" format=3 uid="uid://2cb1coq2krph"]
+
+[ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_wgdfg"]
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="2_mx2io"]
+[ext_resource type="Resource" uid="uid://dhwvg8i8wvx87" path="res://Resources/Moves/SE_BasicBlock.tres" id="3_7h03s"]
+
+[resource]
+script = ExtResource("1_wgdfg")
+action_name = "Block"
+action_type = 1
+action_intensity = 1
+power_scale = 0.0
+statuses_to_apply = Array[ExtResource("2_mx2io")]([ExtResource("3_7h03s")])
+metadata/_custom_type_script = "uid://bgmgv01oo5pyy"

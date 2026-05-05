@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bgmgv01oo5pyy" path="res://Scripts/base_action_template.gd" id="1_8mhu8"]
 [ext_resource type="Script" uid="uid://006v6amg320n" path="res://Scripts/base_troop_template.gd" id="1_anm0s"]
-[ext_resource type="Resource" uid="uid://2cb1coq2krph" path="res://Resources/Moves/Block.tres" id="2_1vx6v"]
-[ext_resource type="Resource" uid="uid://dpttdgo23afsr" path="res://Resources/Moves/Charge.tres" id="3_kgwpv"]
+[ext_resource type="Resource" uid="uid://2cb1coq2krph" path="res://Resources/Moves/DA_Block.tres" id="2_1vx6v"]
+[ext_resource type="Resource" uid="uid://dpttdgo23afsr" path="res://Resources/Moves/OA_Charge.tres" id="3_kgwpv"]
 [ext_resource type="PackedScene" uid="uid://bo7jr1ymusbha" path="res://Scenes/Models/retinue_swordsmen.tscn" id="5_1vx6v"]
 
 [resource]

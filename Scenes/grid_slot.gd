@@ -1,6 +1,7 @@
 extends Area3D 
 class_name GridSlot
 
+
 # ==========================================
 # 1. BASE DATA & NODE REFERENCES
 # ==========================================
@@ -15,7 +16,6 @@ var is_interactable: bool = true
 # ==========================================
 var current_health: float = 0.0
 var current_morale: int = 0
-var next_round_speed_modifier: int = 0
 var active_statuses: Dictionary = {}
 
 # ==========================================
@@ -39,18 +39,22 @@ func _on_battle_phase_started() -> void:
 		visible = false 
 
 func _on_troop_selection_started() -> void:
-	is_interactable = true 
+	# Make sure the whole slot is visible
 	visible = true 
+	
+	# If no troop is assigned yet, show the grey cylinder!
 	if assigned_troop == null and default_mesh != null:
-		default_mesh.visible = true 
+		default_mesh.visible = true
 
 func initialize_combat_stats(troop_data: PlayerTroopData) -> void: 
 	assigned_troop = troop_data
+	
 	# Pull the live stats from the specific generated soldier, NOT the blueprint
 	current_health = troop_data.current_troop_health
 	current_morale = troop_data.troop_morale 
+	
+	# Wipe any old statuses so they don't carry over between battles
 	active_statuses.clear()
-	next_round_speed_modifier = 0
 
 # ==========================================
 # 5. MOUSE INPUT (SETUP PHASE LOGIC)
@@ -121,22 +125,76 @@ func change_morale(amount: int) -> void:
 # ==========================================
 # 7. STATUS EFFECTS & BUFFS
 # ==========================================
-func add_status_effect(effect_name: String, value: float) -> void:
-	active_statuses[effect_name] = value
-	print(assigned_troop.template.troop_name, " gained status: ", effect_name, " (", value, ")")
 
-func calculate_modified_damage(base_damage: int) -> int:
-	var multiplier: float = 1.0
+func add_status_effect(effect_name: String, value: float, duration: int, tick_when: int) -> void:
+	active_statuses[effect_name] = {
+		"value": value,
+		"duration": duration,
+		"tick_when": tick_when
+	}
+	print(assigned_troop.template.troop_name, " gained ", effect_name, " for ", duration, " turns.")
+
+func process_statuses(current_tick_event: String) -> void:
+	# Convert the string from the Manager into our integer Enum so they match
+	var event_enum_value = -1
+	if current_tick_event == "turn_start": event_enum_value = 0
+	elif current_tick_event == "turn_end": event_enum_value = 1
+	elif current_tick_event == "round_start": event_enum_value = 2
+
+	# Loop through all active buffs and see if it's their time to tick
+	var keys_to_remove = []
+	
+	for effect_name in active_statuses.keys():
+		var status_data = active_statuses[effect_name]
+		
+		# If the current event matches when this specific buff is supposed to tick...
+		if status_data["tick_when"] == event_enum_value:
+			status_data["duration"] -= 1
+			
+			if status_data["duration"] <= 0:
+				keys_to_remove.append(effect_name)
+				
+	# Erase the expired ones cleanly
+	for key in keys_to_remove:
+		active_statuses.erase(key)
+		print(assigned_troop.template.troop_name, "'s ", key, " wore off.")
+
+# --- 3. The Math (With Strict Integer Rounding) ---
+func calculate_modified_damage(base_attack_stat: int, power_scale: float) -> int:
+	var output: float = float(base_attack_stat) * power_scale
+	
 	if active_statuses.has("attack_buff"):
-		multiplier += active_statuses["attack_buff"]
+		output *= (1.0 + active_statuses["attack_buff"]["value"])
 		
-	# roundi() rounds to the nearest whole integer!
-	return roundi(base_damage * multiplier) 
+	# NEW: Apply Hunker Down's outgoing damage penalty!
+	if active_statuses.has("damage_output_reduction"):
+		var penalty_multiplier = 1.0 - active_statuses["damage_output_reduction"]["value"]
+		output *= penalty_multiplier
+		
+	return int(round(output))
 
-func calculate_incoming_damage(incoming_damage: int) -> int:
-	var multiplier: float = 1.0
-	if active_statuses.has("defense_buff"):
-		# If they have a 10% defense buff (0.1), they only take 90% of the damage
-		multiplier -= active_statuses["defense_buff"]
+func calculate_incoming_damage(incoming_raw_damage: int) -> int:
+	var final_damage: float = float(incoming_raw_damage)
+	
+	# Apply modular damage reduction (e.g., Hunker Down)
+	if active_statuses.has("damage_reduction"):
+		# If the resource value is 0.5, we multiply damage by 0.5 (reducing it by half)
+		var reduction_multiplier = 1.0 - active_statuses["damage_reduction"]["value"]
+		final_damage *= reduction_multiplier
 		
-	return roundi(incoming_damage * multiplier)
+	# Enforce the strict integer rule using round()
+	return int(round(final_damage))
+
+func get_modified_speed() -> int:
+	# Start with the troop's base speed
+	var current_speed = assigned_troop.troop_speed
+	
+	# Check our smart dictionary for speed modifiers!
+	if active_statuses.has("speed_buff"):
+		current_speed += int(active_statuses["speed_buff"]["value"])
+		
+	if active_statuses.has("speed_debuff"):
+		current_speed -= int(active_statuses["speed_debuff"]["value"])
+		
+	# Ensure speed never drops below 1 so the game doesn't break
+	return max(1, current_speed)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CommanderOrder" format=3 uid="uid://04xqxnekaf2c"]
+
+[ext_resource type="Script" uid="uid://d2glkabxjrhda" path="res://Scripts/commander_order.gd" id="1_gadbc"]
+[ext_resource type="Script" uid="uid://b1ffbp5vfrtr1" path="res://Scripts/status_effect_data.gd" id="2_imnqe"]
+[ext_resource type="Resource" uid="uid://dmokccgxslc5w" path="res://Resources/Moves/SE_A_DamageUp.tres" id="3_r57fb"]
+
+[resource]
+script = ExtResource("1_gadbc")
+order_name = "Attack!"
+statuses_to_apply = Array[ExtResource("2_imnqe")]([ExtResource("3_r57fb")])
+metadata/_custom_type_script = "uid://d2glkabxjrhda"

@@ -11,9 +11,9 @@ var unlocked_orders: Array[CommanderOrder] = []
 func _ready() -> void:
 	# Add the starting cards to the deck the moment the game boots!
 	# (NOTE: Double-check these file paths to make sure they match where you saved them!)
-	unlocked_orders.append(preload("res://Resources/Moves/Attack!.tres"))
-	unlocked_orders.append(preload("res://Resources/Moves/Stand_Strong!.tres"))
-	unlocked_orders.append(preload("res://Resources/Moves/Press_the_Advantage!.tres"))
+	unlocked_orders.append(preload("res://Resources/Moves/CA_Attack!.tres"))
+	unlocked_orders.append(preload("res://Resources/Moves/CA_Stand_Strong!.tres"))
+	unlocked_orders.append(preload("res://Resources/Moves/CA_Press_the_Advantage!.tres"))
 
 signal currency_change(new_currency: int)
 
