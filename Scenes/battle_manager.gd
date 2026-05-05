@@ -282,9 +282,9 @@ func _run_enemy_ai() -> void:
 	var roll = randf()
 	var chosen_target = valid_targets[0] 
 	if valid_targets.size() > 1:
-		if roll > 0.60 and roll <= 0.90:
+		if roll > 0.55:
 			chosen_target = valid_targets[1]
-		elif roll > 0.90:
+		else:
 			var idx = randi_range(2, valid_targets.size() - 1) if valid_targets.size() > 2 else 1
 			chosen_target = valid_targets[idx]
 			
@@ -379,11 +379,10 @@ func _run_resolution() -> void:
 	else:
 		print("DEFEAT! Better luck next time.")
 	
-	# Small delay so player can see the logs/final state
+	# Small delay for log review
 	await get_tree().create_timer(2.5).timeout
 	
-	# Transition back to shop
-	# Make sure this path matches your shop scene location!
+	# Double check transition is to scene file location
 	get_tree().change_scene_to_file("res://Scenes/troop_shop_ui.tscn")
 
 # --- Modular Status Router ---
