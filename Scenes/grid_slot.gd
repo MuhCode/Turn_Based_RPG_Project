@@ -122,6 +122,22 @@ func change_morale(amount: int) -> void:
 	if current_morale <= 0:
 		unit_permadead.emit(self)
 
+func handle_death() -> void:
+	current_health = 0
+	unit_permadead.emit(self) # Alert the timeline
+	
+	# Clean up visuals
+	for child in get_children():
+		if child.is_in_group("troop_model"):
+			child.queue_free()
+			
+	if default_mesh != null:
+		default_mesh.visible = true
+		
+	# Clean up data
+	assigned_troop = null
+	active_statuses.clear()
+
 # ==========================================
 # 7. STATUS EFFECTS & BUFFS
 # ==========================================
